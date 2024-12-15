@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>管理员UI</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .status-approved {
+            color: rgb(238, 240, 238);
+        }
+
+        .status-denied {
+            color: rgb(247, 245, 245);
+        }
+
+        .status-pending {
+            color: rgb(254, 254, 252);
+        }
+
+        .jz {
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="jz">
+        <p>学生指导关系管理系统</p>
+    </div>
+</header>
+<div class="button-container">
+    <a href="administrators.html"><button class="button" type="button">首页</button></a>
+    <a href="whole.html"><button class="button" type="button">查看总体情况</button></a>
+    <button class="button" type="button">查看指导关系进度</button>
+    <button class="button" type="button">查看系统情况</button>
+    <a href="classSearch.html"><button class="button" type="button">按班级汇总</button></a>
+    <a href="majorSearch.html"><button class="button" type="button">按专业汇总</button></a>
+    <a href="department.html"><button class="button" type="button">按系部汇总</button></a>
+    <a href="academy.html"><button class="button" type="button">按学院汇总</button></a>
+</div>
+<table id="dataTable">
+    <tr>
+        <th>题号</th>
+        <th>题目名称</th>
+        <th>选题方式</th>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>班级</th>
+        <th>专业</th>
+        <th>系部</th>
+        <th>学院</th>
+        <th>电话</th>
+        <th>状态</th>
+        <th>详情</th>
+    </tr>
+</table>
+
+<script>
+    // 创建XMLHttpRequest对象
+    var xhr = new XMLHttpRequest();
+
+
+    xhr.open('GET', 'DataServlet', true);
+
+    // 当请求状态改变时的回调函数
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // 将服务器返回的响应文本解析为HTML格式
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(xhr.responseText, 'text/html');
+
+            // 获取服务器返回的HTML中的表格行数据
+            var rows = doc.querySelectorAll('table tr');
+
+            // 获取当前页面中的表格元素
+            var localTable = document.getElementById('dataTable');
+
+            // 清空本地表格之前可能存在的行数据
+            localTable.innerHTML = '';
+
+            // 将服务器返回的每一行数据添加到本地表格中
+            rows.forEach(function (row) {
+                localTable.appendChild(row.cloneNode(true));
+            });
+        }
+    };
+
+    // 发送请求
+    xhr.send();
+</script>
+</body>
+
+</html>

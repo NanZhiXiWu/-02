@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>学生界面 - 浏览毕设题目</title>
+    <style>
+
+        /* 整体页面布局和背景设置 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 左侧导航栏样式 */
+        .sidebar {
+            background-color: #1d2121;
+            width: 200px;
+            padding: 20px;
+            color: white;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .sidebar button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px 25px;
+            background-color: #1d2121;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 主要内容区域样式 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        /* 标题样式 */
+        h2 {
+            text-align: start;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 40px;
+        }
+
+        /* 毕设题目信息表格样式 */
+        #thesisInfoTable {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #thesisInfoTable caption {
+            caption-side: top;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #thesisInfoTable th,
+        #thesisInfoTable td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        #thesisInfoTable th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>功能导航</h3>
+    <button onclick="goToIndexPage()">首页</button>
+    <button id="viewThesisButton" disabled>浏览教师发布的毕设题目</button>/*disabled,进入这个页面以后这个按钮不能再次被按下*/
+    <button id="submitApplicationButton">提交选题申请</button>
+    <button id="viewStatusButton">查看和管理自己的选题状态</button>
+    <button id="viewTeacherContactButton">查看教师的联系方式等信息</button>
+    <button id="editProfileButton">修改个人信息</button>
+</div>
+<div class="main-content">
+    <h2>浏览教师发布的毕设题目</h2>
+    <table id="thesisInfoTable">
+        <caption>教师发布的毕设题目信息</caption>
+        <thead>
+        <tr>
+            <th>课题名</th>
+            <th>课题号</th>
+            <th>选题方式</th>
+            <th>课题创建老师</th>
+            <th>教师联系方式</th>
+            <th>课题要求</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 这里将通过JavaScript动态填充表格数据 -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableBody = document.getElementById('thesisInfoTable').getElementsByTagName('tbody')[0];
+
+        // 使用fetch API从Servlet获取数据并填充表格
+        fetch('GetApprovedServlet')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(topic => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${topic.course_name}</td>
+                            <td>${topic.course_id}</td>
+                            <td>${topic.selection_method}</td>
+                            <td>${topic.teacher_name}</td>
+                            <td>${topic.teacher_contact}</td>
+                            <td>${topic.course_requirements}</td>
+                        `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('获取毕设题目信息失败：', error));
+    });
+</script>
+</body>
+
+</html>

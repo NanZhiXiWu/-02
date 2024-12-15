@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>学术选题提交系统</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* 表单容器样式 */
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 标签样式 */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 输入框和文本域样式 */
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #007BFF;
+        }
+
+        /* 按钮样式 */
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 结果显示区域样式 */
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            text-align: center;
+        }
+
+        /* 成功消息样式 */
+        #result.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* 失败消息样式 */
+        #result.failure {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+
+<body>
+<h1>学术选题提交</h1>
+<h2>请填写以下选题信息</h2>
+<form id="topicSubmissionForm">
+    <label for="topicName">课题名</label>
+    <input type="text" id="topicName" required>
+
+    <label for="topicId">课题号</label>
+    <input type="text" id="topicId" required>
+
+    <label for="selectionMethod">选题方式</label>
+    <select id="selectionMethod" required>
+        <option value="学生自主选择">学生自主选择</option>
+        <option value="教师指定">教师指定</option>
+    </select>
+
+    <label for="teacherName">课题创建教师</label>
+    <input type="text" id="teacherName" required>
+
+    <label for="contactInfo">联系方式</label>
+    <input type="text" id="contactInfo" required>
+
+    <label for="topicRequirements">课题要求</label>
+    <textarea id="topicRequirements" rows="4" required></textarea>
+
+    <button type="submit">提交选题</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    document.getElementById('topicSubmissionForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const topicName = document.getElementById('topicName').value;
+        const topicId = document.getElementById('topicId').value;
+        const selectionMethod = document.getElementById('selectionMethod').value;
+        const teacherName = document.getElementById('teacherName').value;
+        const contactInfo = document.getElementById('contactInfo').value;
+        const topicRequirements = document.getElementById('topicRequirements').value;
+
+        const formData = {
+            topicName: topicName,
+            topicId: topicId,
+            selectionMethod: selectionMethod,
+            teacherName: teacherName,
+            contactInfo: contactInfo,
+            topicRequirements: topicRequirements
+        };
+
+        fetch('SubmitTopicServlet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                if (data.success) {
+                    resultDiv.className ='success';
+                    resultDiv.innerHTML = '选题提交成功，以下是您提交的信息：<br>' +
+                        '课题名: ' + formData.topicName + '<br>' +
+                        '课题号: ' + formData.topicId + '<br>' +
+                        '选题方式: ' + formData.selectionMethod + '<br>' +
+                        '课题创建教师: ' + formData.teacherName + '<br>' +
+                        '联系方式: ' + formData.contactInfo + '<br>' +
+                        '课题要求: ' + formData.topicRequirements;
+                } else {
+                    resultDiv.className = 'failure';
+                    resultDiv.innerHTML = '选题提交失败：' + data.error;
+                }
+            })
+            .catch(error => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'failure';
+                resultDiv.innerHTML = '网络错误：' + error;
+            });
+    });
+</script>
+</body>
+
+</html>

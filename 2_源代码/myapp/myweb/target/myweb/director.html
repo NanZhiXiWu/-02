@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>系主任选课信息查看</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            background-color: white;
+            border-collapse: collapse;
+            width: 90%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+<h1>系主任界面</h1>
+<table id="topicTable">
+    <thead>
+    <tr>
+        <th>课题名</th>
+        <th>课题号</th>
+        <th>选题方式</th>
+        <th>课题创建老师</th>
+        <th>教师联系方式</th>
+        <th>课题要求</th>
+        <th>课题状态</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 这里将通过JavaScript动态填充表格数据 -->
+    </tbody>
+</table>
+
+<script>
+    // 在DOMContentLoaded事件监听器外部定义approveTopic方法
+    function approveTopic(courseId) {
+        // 当点击"通过"按钮时，发送POST请求到Servlet来更新课题状态
+        fetch('ApproveTopicServlet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                courseId: courseId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('课题状态已更新为已批准');
+                    location.reload();
+                } else {
+                    alert('更新课题状态失败：' + data.error);
+                }
+            })
+            .catch(error => console.error('更新课题状态失败：', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableBody = document.getElementById('topicTable').getElementsByTagName('tbody')[0];
+
+        // 使用fetch API从Servlet获取数据并填充表格
+        fetch('GetCourseTopicsServlet')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(topic => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${topic.course_name}</td>
+                            <td>${topic.course_id}</td>
+                            <td>${topic.selection_method}</td>
+                            <td>${topic.teacher_name}</td>
+                            <td>${topic.teacher_contact}</td>
+                            <td>${topic.course_requirements}</td>
+                            <td><button onclick="approveTopic('${topic.course_id}')">通过</button></td>
+                        `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('获取选课信息失败：', error));
+    });
+</script>
+</body>
+
+</html>

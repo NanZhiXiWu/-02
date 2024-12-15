@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>按班级查找</title>
+    <style>
+        /* 整体页面样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 查找表单样式 */
+        form {
+            margin: 20px;
+        }
+
+        /* 下拉列表样式 */
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* 查找按钮样式 */
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        /* 结果表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+<h2>按班级查找学生信息</h2>
+<form id="searchForm">
+    <label for="classSelect">请选择班级：</label>
+    <select id="classSelect" name="selectedClass">
+        <option value="软件工程4">软件工程4</option>
+        <option value="软件工程3">软件工程3</option>
+        <option value="计算机科学与技术4">计算机科学与技术4</option>
+        <option value="计算机科学与技术5">计算机科学与技术5</option>
+    </select>
+    <button type="submit">查找</button>
+</form>
+<table id="resultTable">
+    <tr>
+        <th>题号</th>
+        <th>题目名称</th>
+        <th>选题方式</th>
+        <th>学号</th>
+        <th>姓名</th>
+        <th>班级</th>
+        <th>专业</th>
+        <th>系部</th>
+        <th>学院</th>
+        <th>电话</th>
+        <th>状态</th>
+        <th>详情</th>
+    </tr>
+</table>
+
+<script>
+    // 获取查找表单元素
+    const searchForm = document.getElementById('searchForm');
+    // 获取结果表格元素
+    const resultTable = document.getElementById('resultTable');
+
+    // 为查找表单添加提交事件监听器
+    searchForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // 获取用户选择的班级值
+        const selectedClass = document.getElementById('classSelect').value;
+
+        // 创建XMLHttpRequest对象
+        const xhr = new XMLHttpRequest();
+
+        // 配置请求，设置请求方法为GET，指定请求的URL并添加班级参数
+        xhr.open('GET', 'ClassSearchServlet?selectedClass=' + selectedClass, true);
+
+        // 当请求状态改变时的回调函数
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // 将服务器返回的响应文本解析为HTML格式
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(xhr.responseText, 'text/html');
+
+                // 获取服务器返回的HTML中的表格行数据
+                const rows = doc.querySelectorAll('table tr');
+
+                // 清空本地结果表格之前可能存在的行数据
+                resultTable.innerHTML = '';
+
+                // 将服务器返回的每一行数据添加到本地结果表格中
+                rows.forEach(function (row) {
+                    resultTable.appendChild(row.cloneNode(true));
+                });
+            }
+        };
+
+        // 发送请求
+        xhr.send();
+    });
+</script>
+</body>
+
+</html>
